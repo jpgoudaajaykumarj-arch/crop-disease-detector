@@ -2,10 +2,17 @@ import streamlit as st
 import numpy as np
 from PIL import Image
 import json
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 st.set_page_config(page_title='Crop Disease Detector', page_icon='🌾')
 st.title('🌾 Crop Disease Detector')
 st.write('Upload a Rice or Wheat leaf image to detect disease instantly!')
+
+@st.cache_resource
+def load_model():
+    import tensorflow as tf
+    return tf.keras.models.load_model('model.h5', compile=False)
 
 with open('class_names.json', 'r') as f:
     class_names = json.load(f)
@@ -19,11 +26,6 @@ remedies = {
     'wheat_healthy': {'label': '✅ Wheat — Healthy', 'remedy': 'Your crop is healthy!'},
     'wheat_rust': {'label': '🔴 Wheat — Rust Disease', 'remedy': 'Apply Propiconazole fungicide.'}
 }
-
-@st.cache_resource
-def load_model():
-    import tensorflow as tf
-    return tf.keras.models.load_model('model.h5', compile=False)
 
 uploaded_file = st.file_uploader('📷 Upload Leaf Image', type=['jpg','jpeg','png','webp'])
 
@@ -47,4 +49,3 @@ if uploaded_file is not None:
             st.error(f"💊 {info['remedy']}")
     except Exception as e:
         st.error(f"Error: {str(e)}")
-        st.info("Model loading failed. Please try again.")
