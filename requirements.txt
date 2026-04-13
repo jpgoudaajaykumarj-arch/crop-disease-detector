@@ -1,3 +1,4 @@
+streamlit
 numpy
 Pillow
 h5py
